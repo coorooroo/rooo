@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정부지원금 자부담 계산기</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 20px;
+        }
+        #budgetTable td, #budgetTable th {
+            vertical-align: middle;
+        }
+        .text-right {
+            text-align: right;
+        }
+        /* 추가된 CSS 스타일 */
+        .text-center {
+            text-align: center;
+        }
+        #budgetTable tbody td {
+            background-color: white;
+        }
+        
+        /* 총합 부분 윗선 굵게 설정 */
+        #budgetTable tfoot tr:first-child {
+            border-top: 1.5px solid black;
+        }
+    
+        /* 입력 필드 글씨 색상 변경 */
+        .form-control.item-name,
+        .form-control.item-self,
+        .form-control.item-support {
+            color: #080707; /* 연한 회색으로 변경 */
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <!-- 수정된 부분: h2 태그에 text-center 클래스 추가 -->
+        <h2 class="text-center">정부지원금 자부담 계산기</h2>
+
+        <button onclick="addItem()" class="btn btn-primary btn-sm float-right">항목 추가</button>
+        <tr>
+        <table id="budgetTable" class="table table-striped mt-5">
+            <thead class="thead-light">
+                <tr>
+                    <th>항목명</th>
+                    <th>자부담 금액 (원)</th>
+                    <th>정부지원금 금액 (원)</th>
+                    <th>자부담 비율 (%)</th>
+                    <th>정부지원 비율 (%)</th>
+                
+            </thead>
+            <tbody>
+                <!-- Rows will be added here -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Total</th>
+                    <td id="totalSelfAmount">0원</td>
+                    <td id="totalSupportAmount">0원</td>
+                    <td id="totalSelfPercentage">0%</td>
+                    <td id="totalSupportPercentage">0%</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <script>
+        // Function to add a new item row
+        function addItem() {
+            const tableBody = document.getElementById('budgetTable').querySelector('tbody');
+            const newRow = tableBody.insertRow();
+            newRow.innerHTML = `
+                <td><input type="text" class="form-control item-name" placeholder="항목명"></td>
+                <td><input type="number" class="form-control item-self" placeholder="자부담 금액" oninput="calculateTotals()"></td>
+                <td><input type="number" class="form-control item-support" placeholder="정부지원금 금액" oninput="calculateTotals()"></td>
+                <td class="item-self-percentage text-right">0%</td>
+                <td class="item-support-percentage text-right">0%</td>
+            `;
+        }
+
+        // Function to calculate totals and percentages
+        function calculateTotals() {
+            let totalSelf = 0, totalSupport = 0;
+            const rows = document.getElementById('budgetTable').querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const selfAmount = parseFloat(row.querySelector('.item-self').value) || 0;
+                const supportAmount = parseFloat(row.querySelector('.item-support').value) || 0;
+                totalSelf += selfAmount;
+                totalSupport += supportAmount;
+                row.querySelector('.item-self-percentage').textContent = ((selfAmount / (selfAmount + supportAmount)) * 100 || 0).toFixed(2) + '%';
+                row.querySelector('.item-support-percentage').textContent = ((supportAmount / (selfAmount + supportAmount)) * 100 || 0).toFixed(2) + '%';
+            });
+            document.getElementById('totalSelfAmount').textContent = totalSelf.toLocaleString() + '원';
+            document.getElementById('totalSupportAmount').textContent = totalSupport.toLocaleString() + '원';
+            const totalAmount = totalSelf + totalSupport;
+            document.getElementById('totalSelfPercentage').textContent = ((totalSelf / totalAmount) * 100 || 0).toFixed(2) + '%';
+            document.getElementById('totalSupportPercentage').textContent = ((totalSupport / totalAmount) * 100 || 0).toFixed(2) + '%';
+        }
+
+        // Add initial 5 empty rows
+        for (let i = 0; i < 5; i++) {
+            addItem();
+        }
+    </script>
+</body>
+</html>
